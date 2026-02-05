@@ -1,0 +1,73 @@
+// Copyright 2025 Analog Devices, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#ifndef ADI_IMU__SLIDING_WINDOW_COVARIANCE_PROVIDER_H_
+#define ADI_IMU__SLIDING_WINDOW_COVARIANCE_PROVIDER_H_
+
+#include "adi_imu/imu_covariance_interface.h"
+#include <deque>
+#include <cstddef>
+
+namespace adi_imu
+{
+    /**
+    * @brief Computes covariances over a sliding window of recent samples.
+    *
+    * This provider maintains a fixed-size window of samples and continuously
+    * updates the covariance estimate. Useful for adaptive covariance that 
+    * responds to changing sensor noise characteristics.
+     */
+
+     class SlidingWindowCovarianceProvider : public ImuCovarianceInterface
+     {
+        public:
+            /**
+            * @brief Construct sliding window covariance estimator.
+            * @param window_size Number of samples to keep in window.
+            * @param min_samples Minimum samples befor covariance is valid.
+            * @param min_variance Minimum variance floor.
+             */
+
+             explicit SlidingWindowCovarianceProvider(size_t window_size = 500, size_t min_samples = 100, double min_variance = 1e-9);
+
+             void addSample(const Vec3 & accel, const Vec3 & gyro) override;
+             bool isReady() const override;
+             CovarianceMatrix getAccelCovariance() const override;
+             CovarianceMatrix getGyroCovariance() const override;
+             void reset() override;
+             double getCalibrationProgress() const override;
+
+             private:
+                void recomputeCovariance();
+                double computeVariance(const std::deque<double> & samples, double mean) const;
+
+                size_t window_size;
+                size_t min_samples;
+                double min_variance;
+
+                // Circular buffers for samples
+                std::deque<Vec3> m_accel_samples;
+                std::deque<Vec3> m_gyro_samples;
+
+                // Cached covariance (periodically recomputed)
+                CovarianceMatrix m_accel_covariance;
+                CovarianceMatrix m_gyro_covariance;
+
+                //Recompute every N samples for efficiency
+                size_t m_update_interval
+                size_t m_samples_since_update
+     };
+}   // namespace adi_imu
+
+#endif // ADI_IMU__SLIDING_WINDOW_PROVIDER_H_

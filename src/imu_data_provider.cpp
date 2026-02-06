@@ -74,7 +74,7 @@ bool ImuDataProvider::getData(sensor_msgs::msg::Imu & message)
                 message.angular_velocity_covariance.begin());
     } else {
       // Set to -1 to indicate unknown during calibration
-      message.linear_acceleration_covariance_covariance[0] = -1;
+      message.linear_acceleration_covariance[0] = -1;
       message.angular_velocity_covariance[0] = -1;
     }
   } else {

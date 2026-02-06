@@ -49,7 +49,7 @@ namespace adi_imu
             double computeVariance(double M2, size_t n) const;
 
             size_t m_target_samples;
-            size_t m_samples_count;
+            size_t m_sample_count;
             double m_min_variance;
 
             // Welford state for accelerometer (mean and M2 for each axis)
@@ -68,4 +68,4 @@ namespace adi_imu
     };
 } // namespace adi_imu
 
-#endif // ADI_IMU__WELFORD_COVARIANCE_PROVIDER_M_
+#endif // ADI_IMU__WELFORD_COVARIANCE_PROVIDER_H_

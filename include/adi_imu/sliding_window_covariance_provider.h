@@ -65,8 +65,8 @@ namespace adi_imu
                 CovarianceMatrix m_gyro_covariance;
 
                 //Recompute every N samples for efficiency
-                size_t m_update_interval
-                size_t m_samples_since_update
+                size_t m_update_interval;
+                size_t m_samples_since_update;
      };
 }   // namespace adi_imu
 

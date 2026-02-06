@@ -50,7 +50,7 @@ namespace adi_imu
         return std::max(variance, m_min_variance);
     }
 
-    void WelfordCovarianceProvider::addSample(const Vec3 & accel, const Vec & gyro)
+    void WelfordCovarianceProvider::addSample(const Vec3 & accel, const Vec3 & gyro)
     {
         if (m_calibration_complete){
             return;
@@ -65,9 +65,9 @@ namespace adi_imu
         updateWelford(accel.z, m_accel_mean.z, m_accel_M2.z, n);
 
         // Update gyro statistics
-        updateWelford(gyro.x, m_gyro_mean.x, m_accel_M2.x, n);
-        updateWelford(gyro.y, m_gyro_mean.y, m_accel_M2.y, n);
-        updateWelford(gyro.z, m_gyro_mean.z, m_accel_M2.z, n);
+        updateWelford(gyro.x, m_gyro_mean.x, m_gyro_M2.x, n);
+        updateWelford(gyro.y, m_gyro_mean.y, m_gyro_M2.y, n);
+        updateWelford(gyro.z, m_gyro_mean.z, m_gyro_M2.z, n);
 
         // Check if calibration is complete
         if(m_target_samples <= m_sample_count){

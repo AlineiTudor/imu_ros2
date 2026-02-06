@@ -13,10 +13,9 @@
 // limitations under the License.
 
 #ifndef ADI_IMU__IMU_COVARIANCE_FACTORY_H_
-#define ADI_IMU__IMU_COVARIANCE_FACOTRY_H_
+#define ADI_IMU__IMU_COVARIANCE_FACTORY_H_
 
 #include "adi_imu/imu_covariance_interface.h"
-#include "imu_covariance_interface.h"
 #include <rclcpp/rclcpp.hpp>
 #include <memory>
 #include <string>

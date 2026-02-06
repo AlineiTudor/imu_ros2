@@ -52,9 +52,9 @@ namespace adi_imu
                 void recomputeCovariance();
                 double computeVariance(const std::deque<double> & samples, double mean) const;
 
-                size_t window_size;
-                size_t min_samples;
-                double min_variance;
+                size_t m_window_size;
+                size_t m_min_samples;
+                double m_min_variance;
 
                 // Circular buffers for samples
                 std::deque<Vec3> m_accel_samples;

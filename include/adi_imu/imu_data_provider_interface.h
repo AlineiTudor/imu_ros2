@@ -26,6 +26,9 @@
 namespace adi_imu
 {
 
+// Forward declaration of covariance interface
+class ImuCovarianceInterface;
+
 /**
  * @brief Interface for standard message sensor_msgs::msg::Imu data provider.
  */

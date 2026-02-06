@@ -26,7 +26,7 @@ namespace adi_imu
         if(algorithm_str == "welford") return CovarianceAlgorithm::WELFORD_ONLINE;
         if(algorithm_str == "sliding_window") return CovarianceAlgorithm::SLIDING_WINDOW;
 
-        throw std::invalid_argument("Unknown covariance algorithmL " + algorithm_str);
+        throw std::invalid_argument("Unknown covariance algorithm: " + algorithm_str);
     }
 
     std::unique_ptr<ImuCovarianceInterface> ImuCovarianceFactory::createFromParameters(const std::shared_ptr<rclcpp::Node> & node)

@@ -32,6 +32,11 @@ namespace adi_imu
         };
     }
 
+    StaticCovarianceProvider::StaticCovarianceProvider(
+        const CovarianceMatrix & accel_cov, const CovarianceMatrix & gyro_cov):
+        m_accel_covariance(accel_cov), m_gyro_covariance(gyro_cov)
+    {}
+
     void StaticCovarianceProvider::addSample(const Vec3 &, const Vec3 &){
         // Nothing to add here for the static covariances
     }

@@ -55,6 +55,13 @@ public:
    * measured data and false otherwise.
    */
   virtual bool getData(sensor_msgs::msg::Imu & message) = 0;
+
+
+  /**
+  * @brief Method to set the desired covariance algorithm
+  * @param provider The provider can be an instance of: Static, Welford or SlidingWindow providers
+   */
+  virtual void setCovarianceProvider(ImuCovarianceInterface * provider) = 0;
 };
 
 }  // namespace adi_imu

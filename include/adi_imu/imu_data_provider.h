@@ -24,9 +24,11 @@
 
 #include "adi_imu/iio_wrapper.h"
 #include "adi_imu/imu_data_provider_interface.h"
+#include "adi_imu/imu_covariance_interface.h" // Publish covariances
 
 namespace adi_imu
 {
+
 
 /**
  * @brief Class for standard message sensor_msgs::msg::Imu data provider.
@@ -58,12 +60,21 @@ public:
    */
   bool getData(sensor_msgs::msg::Imu & message) override;
 
+  /**
+  * @brief Set the covariance provider for IMU messages.
+  * @param provider Pointer to covariance provider (ownership not transferred).
+   */
+  void setCovarianceProvider(ImuCovarianceInterface * provider) override;
+
 private:
   /*! This data member is used to access sensor information via libiio. */
   IIOWrapper m_iio_wrapper;
 
   /*! The TF frame ID for the IMU sensor. */
   std::string m_frame_id;
+
+  /*! Optional covariance provider for populating covariance matrices. */
+  ImuCovarianceInterface * m_covariance_provider = nullptr;
 };
 
 }  // namespace adi_imu

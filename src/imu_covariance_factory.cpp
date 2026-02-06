@@ -26,7 +26,7 @@ namespace adi_imu
         if(algorithm_str == "welford") return CovarianceAlgorithm::WELFORD_ONLINE;
         if(algorithm_str == "sliding_window") return CovarianceAlgorithm::SLIDING_WINDOW;
 
-        throw std::invalid_argument("Ungnown covariance algorithmL " + algorithm_str);
+        throw std::invalid_argument("Unknown covariance algorithmL " + algorithm_str);
     }
 
     std::unique_ptr<ImuCovarianceInterface> ImuCovarianceFactory::createFromParameters(const std::shared_ptr<rclcpp::Node> & node)
@@ -55,7 +55,7 @@ namespace adi_imu
         bool enable = node->get_parameter("covariance.enable").as_bool();
         if (!enable){
             RCLCPP_INFO(node->get_logger(), "Covariance computation disabled.");
-            return nullptr
+            return nullptr;
         }
 
         std::string algorithm_str = node->get_parameter("covariance.algorithm").as_string();
@@ -73,14 +73,14 @@ namespace adi_imu
         switch (algorithm){
             case CovarianceAlgorithm::STATIC:{
                 Vec3 accel_var = {
-                    node->get_parameter("covariance.static.accel_variance_x").as_double();
-                    node->get_parameter("covariance.static.accel_variance_y").as_double();
-                    node->get_parameter("covariance.static.accel_variance_z").as_double();
+                    node->get_parameter("covariance.static.accel_variance_x").as_double(),
+                    node->get_parameter("covariance.static.accel_variance_y").as_double(),
+                    node->get_parameter("covariance.static.accel_variance_z").as_double(),
                 };
                 Vec3 gyro_var = {
-                    node->get_parameter("covariance.static.gyro_variance_x").as_double();
-                    node->get_parameter("covariance.static.gyro_variance_y").as_double();
-                    node->get_parameter("covariance.static.gyro_variance_z").as_double();
+                    node->get_parameter("covariance.static.gyro_variance_x").as_double(),
+                    node->get_parameter("covariance.static.gyro_variance_y").as_double(),
+                    node->get_parameter("covariance.static.gyro_variance_z").as_double(),
                 };
                 return std::make_unique<StaticCovarianceProvider>(accel_var, gyro_var);
             }

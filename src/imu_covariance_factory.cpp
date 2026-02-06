@@ -91,7 +91,7 @@ namespace adi_imu
             }
             case CovarianceAlgorithm::SLIDING_WINDOW:{
                 size_t window_size = static_cast<size_t>(node->get_parameter("covariance.sliding_window.window_size").as_int());
-                size_t min_samples = static_cast<size_t>(node->declare_parameter("covariance.sliding_window.min_samples").as_int());
+                size_t min_samples = static_cast<size_t>(node->get_parameter("covariance.sliding_window.min_samples").as_int());
                 return std::make_unique<SlidingWindowCovarianceProvider>(window_size, min_samples);
             }
         }

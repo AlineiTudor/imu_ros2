@@ -66,6 +66,12 @@ namespace adi_imu
              virtual bool isReady() const = 0;
 
             /**
+            * @brief Get the linear acceleration covariance matrix.
+            * @return 3x3 covariance matrix row-major order.
+            */
+            virtual CovarianceMatrix getAccelCovariance() const = 0;
+            
+            /**
             * @brief Get the angular velocity covariance matrix.
             * @return 3x3 covariance matrix row-major order.
             */

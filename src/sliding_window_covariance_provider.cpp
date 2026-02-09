@@ -29,6 +29,124 @@ namespace adi_imu
         m_update_interval(50),
         m_samples_since_update(0)
         {}
+
+        void SlidingWindowCovarianceProvider::addSample(const Vec3 & accel, const Vec3 & gyro)
+        {
+            // Add to buffers
+            m_accel_samples.push_back(accel);
+            m_gyro_samples.push_bach(gyro);
+
+            // Maintain window size
+            if (m_accel_samples.size() > m_window_size){
+                m_accel_samples.pop_front();
+                m_gyro_samples.pop_front();
+            }
+
+            // Recompute periodically for efficiency
+            m_samples_since_update++;
+            if (m_samples_since_update >= m_update interval && isReady()){
+                recomputeCovariance();
+                m_samples_since_update = 0;
+            }
+        }
+
+        bool SlidingWindowCovarianceProvider::isReady() const
+        {
+            return m_accel_samples.size() >= m_min_samples;
+        }
+
+        void SlidingWindowCovarianceProvider::recomputeCovariance()
+        {
+            size_t n = m_accel_samples.size();
+            if (n < 2){
+                return;
+            }
+
+            // Compute means
+            Vec3 accel_mean = {0.0, 0.0, 0.0};
+            Vec3 gyro_mean = {0.0, 0.0, 0.0};
+
+            for (const auto & s : m_accel_samples){
+                accel_mean.x += s.x;
+                accel_mean.y += s.y;
+                accel_mean.z += s.z;
+            }
+            
+            for (const auto & s : m_gyro_samples){
+                gyro_mean.x += s.x;
+                gyro_mean.y += s.y;
+                gyro_mean.z += s.z;
+            }
+
+            double dn = static_cast<double>(n);
+            accel_mean.x /= dn;
+            accel_mean.y /= dn;
+            accel_mean.z /= dn;
+            gyro_mean.x /= dn;
+            gyro_mean.y /= dn;
+            gyro_mean.z /= dn;
+
+            // Compute variances
+            Vec3 accel_var = {0.0, 0.0, 0.0};
+            Vec3 gyro_var = {0.0, 0.0, 0.0};
+
+            for (const auto & s : m_accel_samples){
+                accel_var.x += (s.x - accel_mean.x) * (s.x - accel_mean.x);
+                accel_var.y += (s.y - accel_mean.y) * (s.y - accel_mean.y);
+                accel_var.z += (s.z - accel_mean.z) * (s.z - accel_mean.z);
+            }
+
+            for (const auto & s : m_accel_samples){
+                gyro_var.x += (s.x - gyro_mean.x) * (s.x - gyro_mean.x);
+                gyro_var.y += (s.y - gyro_mean.y) * (s.y - gyro_mean.y);
+                gyro_var.z += (s.z - gyro_mean.z) * (s.z - gyro_mean.z);
+            }
+
+            // Applying Bessel correction for unbiased variance
+            double dn1 = static_cast<double>(n-1);
+            accel_var.x = std::max(accel_var.x / dn1, min_variance);
+            accel_var.y = std::max(accel_var.y / dn1, min_variance);
+            accel_var.z = std::max(accel_var.z / dn1, min_variance);
+            gyro_var.x = std::max(accel_var.x / dn1, min_variance);
+            gyro_var.z = std::max(accel_var.y / dn1, min_variance);
+            gyro_var.y = std::max(accel_var.z / dn1, min_variance);
+
+            m_accel_covariance = {
+                accel_var.x, 0.0, 0.0,
+                0.0, accel_var.y, 0.0,
+                0.0, 0.0, accel_var.z
+            };
+
+            m_gyro_covariance = {
+                gyro_var.x, 0.0, 0.0,
+                0.0, gyro_var.y, 0.0,
+                0.0, 0.0, gyro_var.z
+            };    
+        }
+
+        CovarianceMatrix SlidingWindowCovarianceProvider::getAccelCovariance() const{
+            return m_accel_covariance;
+        }
+
+        CovarianceMatrix SlidingWindowCovarianceProvider::getGyroCovariance() const {
+            return m_gyro_covariance;
+        }
+
+        void SlidingWindowCovariancePovider::reset(){
+            m_accel_samples.clear();
+            m_gyro_samples.clear();
+            m_accel_covariance = {};
+            m_gyro_covariance = {};
+            m_samples_since_update = 0;
+        }
+
+        double SlidingWindowCovarianceProvider::getCalibrationProgress() const
+        {
+            if (m_accel_samples.size() >= m_min_samples){
+                return 1.0;
+            }
+            return static_cast<double>(m_accel_samples.size()) / static_cast<double>(m_min_samples);
+        }
         
 
 }   // namespace adi_imu

@@ -25,6 +25,7 @@ namespace adi_imu
         if(algorithm_str == "static") return CovarianceAlgorithm::STATIC;
         if(algorithm_str == "welford") return CovarianceAlgorithm::WELFORD_ONLINE;
         if(algorithm_str == "sliding_window") return CovarianceAlgorithm::SLIDING_WINDOW;
+        if(algorithm_str == "ewma") return CovarianceAlgorithm::EWMA;
 
         throw std::invalid_argument("Unknown covariance algorithm: " + algorithm_str);
     }
@@ -50,6 +51,11 @@ namespace adi_imu
         node->declare_parameter("covariance.static.gyro_variance_x", 0.001);
         node->declare_parameter("covariance.static.gyro_variance_y", 0.001);
         node->declare_parameter("covariance.static.gyro_variance_z", 0.001);
+
+        // Exponentially-Weighted moving average (EWMA) covariance parameters
+        node->declare_parameter("covariance.ewma.alpha",0.1);
+        node->declare_parameter("covariance.ewma.warmup_samples",200);
+        node->declare_parameter("covariance.ewma.min_variance",1e-9);
 
         // Check if covariance is enabled
         bool enable = node->get_parameter("covariance.enable").as_bool();
@@ -93,6 +99,12 @@ namespace adi_imu
                 size_t window_size = static_cast<size_t>(node->get_parameter("covariance.sliding_window.window_size").as_int());
                 size_t min_samples = static_cast<size_t>(node->get_parameter("covariance.sliding_window.min_samples").as_int());
                 return std::make_unique<SlidingWindowCovarianceProvider>(window_size, min_samples);
+            }
+            case CovarianceAlgorithm::EWMA:{
+                double alpha = node->get_parameter("covariance.ewma.alpha").as_double();
+                size_t warmup_samples = static_cast<size_t>(node->get_paramter("covariance.ewma.warmup_samples").as_int());
+                double min_variance = node->get_parameter("covariance.ewma.min_variance").as_double();
+                return std::make_unique<EwmaCovarianceProvider>(alpha, warmup_samples, min_variance);
             }
         }
 

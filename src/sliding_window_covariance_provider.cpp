@@ -32,9 +32,15 @@ namespace adi_imu
 
         void SlidingWindowCovarianceProvider::addSample(const Vec3 & accel, const Vec3 & gyro)
         {
+            // Guard against NaN from sensor
+            if (std::isnan(accel.x) || std::isnan(accel.y) || std::isnan(accel.z) ||
+                std::isnan(gyro.x) || std::isnan(gyro.y) || std::isnan(gyro.z)) {
+            return;
+            }
+
             // Add to buffers
             m_accel_samples.push_back(accel);
-            m_gyro_samples.push_bach(gyro);
+            m_gyro_samples.push_back(gyro);
 
             // Maintain window size
             if (m_accel_samples.size() > m_window_size){
@@ -44,7 +50,7 @@ namespace adi_imu
 
             // Recompute periodically for efficiency
             m_samples_since_update++;
-            if (m_samples_since_update >= m_update interval && isReady()){
+            if (m_samples_since_update >= m_update_interval && isReady()){
                 recomputeCovariance();
                 m_samples_since_update = 0;
             }
@@ -96,7 +102,7 @@ namespace adi_imu
                 accel_var.z += (s.z - accel_mean.z) * (s.z - accel_mean.z);
             }
 
-            for (const auto & s : m_accel_samples){
+            for (const auto & s : m_gyro_samples){
                 gyro_var.x += (s.x - gyro_mean.x) * (s.x - gyro_mean.x);
                 gyro_var.y += (s.y - gyro_mean.y) * (s.y - gyro_mean.y);
                 gyro_var.z += (s.z - gyro_mean.z) * (s.z - gyro_mean.z);
@@ -104,12 +110,12 @@ namespace adi_imu
 
             // Applying Bessel correction for unbiased variance
             double dn1 = static_cast<double>(n-1);
-            accel_var.x = std::max(accel_var.x / dn1, min_variance);
-            accel_var.y = std::max(accel_var.y / dn1, min_variance);
-            accel_var.z = std::max(accel_var.z / dn1, min_variance);
-            gyro_var.x = std::max(accel_var.x / dn1, min_variance);
-            gyro_var.z = std::max(accel_var.y / dn1, min_variance);
-            gyro_var.y = std::max(accel_var.z / dn1, min_variance);
+            accel_var.x = std::max(accel_var.x / dn1, m_min_variance);
+            accel_var.y = std::max(accel_var.y / dn1, m_min_variance);
+            accel_var.z = std::max(accel_var.z / dn1, m_min_variance);
+            gyro_var.x = std::max(gyro_var.x / dn1, m_min_variance);
+            gyro_var.y = std::max(gyro_var.y / dn1, m_min_variance);
+            gyro_var.z = std::max(gyro_var.z / dn1, m_min_variance);
 
             m_accel_covariance = {
                 accel_var.x, 0.0, 0.0,
@@ -132,7 +138,7 @@ namespace adi_imu
             return m_gyro_covariance;
         }
 
-        void SlidingWindowCovariancePovider::reset(){
+        void SlidingWindowCovarianceProvider::reset(){
             m_accel_samples.clear();
             m_gyro_samples.clear();
             m_accel_covariance = {};

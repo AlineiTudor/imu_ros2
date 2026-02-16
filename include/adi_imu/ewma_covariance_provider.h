@@ -16,6 +16,7 @@
 #define ADI_IMU__EWMA_WINDOW_COVARIANCE_PROVIDER_H_
 
 #include "adi_imu/imu_covariance_interface.h"
+#include <cstddef>
 
 namespace adi_imu
 {

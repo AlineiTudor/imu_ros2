@@ -17,8 +17,16 @@ namespace adi_imu
         {}
 
     void EwmaCovarianceProvider::addSample(const Vec3 & accel, const Vec3 & gyro)
-    {
-        m_sample_count++;
+    {   
+        // Guard against NaN from sensor
+        if (std::isnan(accel.x) || std::isnan(accel.y) || std::isnan(accel.z) ||
+            std::isnan(gyro.x) || std::isnan(gyro.y) || std::isnan(gyro.z)) {
+        return;
+        }
+        // Only increment until warmup completes - prevents overflow
+        if (m_sample_count < m_warmup_samples){
+            m_sample_count++;
+        }
 
         if(m_sample_count == 1){
             //Initialize with first sample
@@ -29,12 +37,12 @@ namespace adi_imu
 
         //EWMA mean update : mean_t = alpha * x_t + (1-alpha) * mean_{t-1}
         auto updateMean = [this](double x, double & mean){
-            mean = m_alpha * x + (1.0 - alpha) * mean;
+            mean = m_alpha * x + (1.0 - m_alpha) * mean;
         };
 
         //EWMA variance update: var_t = alpha * (x_t - mean_t)^2 + (1-alpha) * var_{t-1}
         auto updateVar = [this](double x, double mean, double & var){
-            double didd = x - mean;
+            double diff = x - mean;
             var = m_alpha * (diff * diff) + (1.0 - m_alpha) * var;
         };
 
@@ -59,7 +67,7 @@ namespace adi_imu
         return m_sample_count >= m_warmup_samples;
     }
 
-    CovarianceMatrix EwmaCovarianceProvider::getAccelCovariance(){
+    CovarianceMatrix EwmaCovarianceProvider::getAccelCovariance() const {
         return {
             std::max(m_accel_var.x, m_min_variance), 0.0, 0.0,
             0.0, std::max(m_accel_var.y, m_min_variance), 0.0,
@@ -67,7 +75,7 @@ namespace adi_imu
         };
     }
 
-    CovarianceMatrix EwmaCovarianceProvider::getGyroCovariance(){
+    CovarianceMatrix EwmaCovarianceProvider::getGyroCovariance() const {
         return {
             std::max(m_gyro_var.x, m_min_variance), 0.0, 0.0,
             0.0, std::max(m_gyro_var.y, m_min_variance), 0.0,

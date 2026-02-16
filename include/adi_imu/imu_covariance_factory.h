@@ -30,7 +30,8 @@ namespace adi_imu
      {
        STATIC,          // Fixed values from parameters
        WELFORD_ONLINE,  // Calibration-based (Welford's algorithm)
-       SLIDING_WINDOW   // Adaptive sliding window
+       SLIDING_WINDOW,  // Adaptive sliding window
+       EWMA,            // Exponentially-Weighted Moving Average (EWMA)
      };
 
      /**

@@ -16,6 +16,7 @@
 #include "adi_imu/static_covariance_provider.h"
 #include "adi_imu/welford_covariance_provider.h"
 #include "adi_imu/sliding_window_covariance_provider.h"
+#include "adi_imu/ewma_covariance_provider.h"
 #include <stdexcept>
 
 namespace adi_imu
@@ -102,7 +103,7 @@ namespace adi_imu
             }
             case CovarianceAlgorithm::EWMA:{
                 double alpha = node->get_parameter("covariance.ewma.alpha").as_double();
-                size_t warmup_samples = static_cast<size_t>(node->get_paramter("covariance.ewma.warmup_samples").as_int());
+                size_t warmup_samples = static_cast<size_t>(node->get_parameter("covariance.ewma.warmup_samples").as_int());
                 double min_variance = node->get_parameter("covariance.ewma.min_variance").as_double();
                 return std::make_unique<EwmaCovarianceProvider>(alpha, warmup_samples, min_variance);
             }

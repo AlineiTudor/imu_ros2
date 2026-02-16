@@ -52,6 +52,12 @@ namespace adi_imu
 
     void WelfordCovarianceProvider::addSample(const Vec3 & accel, const Vec3 & gyro)
     {
+        // Guard against NaN from sensor
+        if (std::isnan(accel.x) || std::isnan(accel.y) || std::isnan(accel.z) ||
+            std::isnan(gyro.x) || std::isnan(gyro.y) || std::isnan(gyro.z)) {
+        return;
+        }
+
         if (m_calibration_complete){
             return;
         }

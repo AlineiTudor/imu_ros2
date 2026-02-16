@@ -135,7 +135,7 @@ int main(int argc, char * argv[])
   // Inject covariance provider into IMU data provider if enabled
   if (covariance_provider){
     imu_std_data_provider->setCovarianceProvider(covariance_provider.get());
-    RCLCPP_INFO(imu_node->get_logger(), "Covariance provider arrached to ImuDataProvider.");
+    RCLCPP_INFO(imu_node->get_logger(), "Covariance provider attached to ImuDataProvider.");
   } else {
     RCLCPP_INFO(imu_node->get_logger(), "Covariance computation disabled (covariance.enable = false).");
   }

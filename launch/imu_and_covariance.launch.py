@@ -70,7 +70,7 @@ def generate_launch_description():
                        '\tsliding_window:  Adaptive sliding window\n'
                        '\tewma: Exponentially-Weighted Moving Average (EWMA)\n'
                        '\tkalman: Kalman filter-based variance estimation\n'),
-        default_value = 'ewma',
+        default_value = 'kalman',
         choices = ['static', 'welford', 'sliding_window', 'ewma', 'kalman']
     )
 

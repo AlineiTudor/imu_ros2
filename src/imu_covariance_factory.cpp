@@ -17,6 +17,7 @@
 #include "adi_imu/welford_covariance_provider.h"
 #include "adi_imu/sliding_window_covariance_provider.h"
 #include "adi_imu/ewma_covariance_provider.h"
+#include "adi_imu/kalman_covariance_provider.h"
 #include <stdexcept>
 
 namespace adi_imu
@@ -27,6 +28,7 @@ namespace adi_imu
         if(algorithm_str == "welford") return CovarianceAlgorithm::WELFORD_ONLINE;
         if(algorithm_str == "sliding_window") return CovarianceAlgorithm::SLIDING_WINDOW;
         if(algorithm_str == "ewma") return CovarianceAlgorithm::EWMA;
+        if(algorithm_str == "kalman") return CovarianceAlgorithm::KALMAN;
 
         throw std::invalid_argument("Unknown covariance algorithm: " + algorithm_str);
     }
@@ -57,6 +59,13 @@ namespace adi_imu
         node->declare_parameter("covariance.ewma.alpha",0.1);
         node->declare_parameter("covariance.ewma.warmup_samples",200);
         node->declare_parameter("covariance.ewma.min_variance",1e-9);
+
+        // Kalman filter covariance parameters
+        node->declare_parameter("covariance.kalman.process_noise_q", 1e-8);
+        node->declare_parameter("covariance.kalman.measurement_noise_r", 1e-4);
+        node->declare_parameter("covariance.kalman.initial_variance", 1e-4);
+        node->declare_parameter("covariance.kalman.warmup_samples", 100);
+        node->declare_parameter("covariance.kalman.min_variance", 1e-12);
 
         // Check if covariance is enabled
         bool enable = node->get_parameter("covariance.enable").as_bool();
@@ -106,6 +115,15 @@ namespace adi_imu
                 size_t warmup_samples = static_cast<size_t>(node->get_parameter("covariance.ewma.warmup_samples").as_int());
                 double min_variance = node->get_parameter("covariance.ewma.min_variance").as_double();
                 return std::make_unique<EwmaCovarianceProvider>(alpha, warmup_samples, min_variance);
+            }
+            case CovarianceAlgorithm::KALMAN:{
+                double process_noise_q = node->get_parameter("covariance.kalman.process_noise_q").as_double();
+                double measurement_noise_r = node->get_parameter("covariance.kalman.measurement_noise_r").as_double();
+                double initial_variance = node->get_parameter("covariance.kalman.initial_variance").as_double();
+                size_t warmup_samples = static_cast<size_t>(node->get_parameter("covariance.kalman.warmup_samples").as_int());
+                double min_variance = node->get_parameter("covariance.kalman.min_variance").as_double();
+                return std::make_unique<KalmanCovarianceProvider>(
+                    process_noise_q, measurement_noise_r, initial_variance, warmup_samples, min_variance);
             }
         }
 

@@ -32,6 +32,7 @@ namespace adi_imu
        WELFORD_ONLINE,  // Calibration-based (Welford's algorithm)
        SLIDING_WINDOW,  // Adaptive sliding window
        EWMA,            // Exponentially-Weighted Moving Average (EWMA)
+       KALMAN,          // Kalman filter-based variance estimation
      };
 
      /**

@@ -68,9 +68,10 @@ def generate_launch_description():
                        '\tstatic: Fixed values from parameters.\n'
                        '\twelford: Calibration-based (Welford\'s algorithm)\n'
                        '\tsliding_window:  Adaptive sliding window\n'
-                       '\tewma: Exponentially-Weighted Moving Average (EWMA)\n'),
+                       '\tewma: Exponentially-Weighted Moving Average (EWMA)\n'
+                       '\tkalman: Kalman filter-based variance estimation\n'),
         default_value = 'ewma',
-        choices = ['static', 'welford', 'sliding_window', 'ewma']
+        choices = ['static', 'welford', 'sliding_window', 'ewma', 'kalman']
     )
 
     # --- Static covariance parameters ---
@@ -143,9 +144,35 @@ def generate_launch_description():
     ewma_min_variance_arg = DeclareLaunchArgument(
         'ewma_min_variance',
         description = 'Minimum variance floor for EWMA algorithm',
-        default_value = '1e-9' 
+        default_value = '1e-9'
     )
 
+    # --- Kalman filter parameters ---
+    kalman_process_noise_q_arg = DeclareLaunchArgument(
+        'kalman_process_noise_q',
+        description = 'Kalman process noise Q (variance change rate). Larger = more adaptive.',
+        default_value = '1e-2'
+    )
+    kalman_measurement_noise_r_arg = DeclareLaunchArgument(
+        'kalman_measurement_noise_r',
+        description = 'Kalman measurement noise R (noise in variance observations).',
+        default_value = '1e-4'
+    )
+    kalman_initial_variance_arg = DeclareLaunchArgument(
+        'kalman_initial_variance',
+        description = 'Initial variance estimate for Kalman filter.',
+        default_value = '1e-4'
+    )
+    kalman_warmup_samples_arg = DeclareLaunchArgument(
+        'kalman_warmup_samples',
+        description = 'Warmup samples before Kalman covariance estimates are valid.',
+        default_value = '100'
+    )
+    kalman_min_variance_arg = DeclareLaunchArgument(
+        'kalman_min_variance',
+        description = 'Minimum variance floor for Kalman filter.',
+        default_value = '1e-12'
+    )
 
     # =========================================================================
     # LaunchConfigurations (retrieve values from arguments)
@@ -180,6 +207,13 @@ def generate_launch_description():
     ewma_alpha = LaunchConfiguration('ewma_alpha')
     ewma_warmup_samples = LaunchConfiguration('ewma_warmup_samples')
     ewma_min_variance = LaunchConfiguration('ewma_min_variance')
+
+    # Kalman
+    kalman_process_noise_q = LaunchConfiguration('kalman_process_noise_q')
+    kalman_measurement_noise_r = LaunchConfiguration('kalman_measurement_noise_r')
+    kalman_initial_variance = LaunchConfiguration('kalman_initial_variance')
+    kalman_warmup_samples = LaunchConfiguration('kalman_warmup_samples')
+    kalman_min_variance = LaunchConfiguration('kalman_min_variance')
 
     # =========================================================================
     # Node definition
@@ -216,6 +250,12 @@ def generate_launch_description():
             {'covariance.ewma.alpha': ewma_alpha},
             {'covariance.ewma.warmup_samples': ewma_warmup_samples},
             {'covariance.ewma.min_variance': ewma_min_variance},
+            # Kalman
+            {'covariance.kalman.process_noise_q': kalman_process_noise_q},
+            {'covariance.kalman.measurement_noise_r': kalman_measurement_noise_r},
+            {'covariance.kalman.initial_variance': kalman_initial_variance},
+            {'covariance.kalman.warmup_samples': kalman_warmup_samples},
+            {'covariance.kalman.min_variance': kalman_min_variance},
         ],
         remappings=[('/imu', '/imu/data_raw')],
         output='screen'
@@ -251,6 +291,12 @@ def generate_launch_description():
         ewma_alpha_arg,
         ewma_warmup_samples_arg,
         ewma_min_variance_arg,
+        # Kalman
+        kalman_process_noise_q_arg,
+        kalman_measurement_noise_r_arg,
+        kalman_initial_variance_arg,
+        kalman_warmup_samples_arg,
+        kalman_min_variance_arg,
         # Node
         adi_imu_node,
     ])

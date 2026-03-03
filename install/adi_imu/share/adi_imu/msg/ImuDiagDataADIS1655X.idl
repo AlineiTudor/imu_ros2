@@ -1,0 +1,97 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from adi_imu/msg/ImuDiagDataADIS1655X.msg
+// generated code does not contain a copyright notice
+
+#include "std_msgs/msg/Header.idl"
+
+module adi_imu {
+  module msg {
+    @verbatim (language="comment", text=
+      "  @file   ImuDiagData.msg" "\n"
+      "  @brief  Definition of ImuDiagData message" "\n"
+      "  @author Robert Budai (robert.budai@analog.com)" "\n"
+      "" "\n"
+      "Copyright 2023(c) Analog Devices, Inc." "\n"
+      "" "\n"
+      "Licensed under the Apache License, Version 2.0 (the \"License\");" "\n"
+      "you may not use this file except in compliance with the License." "\n"
+      "You may obtain a copy of the License at" "\n"
+      "" "\n"
+      "    http://www.apache.org/licenses/LICENSE-2.0" "\n"
+      "" "\n"
+      "Unless required by applicable law or agreed to in writing, software" "\n"
+      "distributed under the License is distributed on an \"AS IS\" BASIS," "\n"
+      "WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied." "\n"
+      "See the License for the specific language governing permissions and" "\n"
+      "limitations under the License.")
+    struct ImuDiagDataADIS1655X {
+      @verbatim (language="comment", text=
+        "message header")
+      std_msgs::msg::Header header;
+
+      @verbatim (language="comment", text=
+        "if true, one of the datapaths experienced an overrun condition")
+      boolean diag_data_path_overrun;
+
+      @verbatim (language="comment", text=
+        "if true, the most recent imu memory flash failed")
+      boolean diag_flash_memory_update_error;
+
+      @verbatim (language="comment", text=
+        "if true, sensor automatically reset themselves to clear an issue")
+      boolean diag_automatic_reset;
+
+      @verbatim (language="comment", text=
+        "if true, while operating in scaled sync mode, indicates the sampling time is not scaling correctly")
+      boolean diag_clock_error;
+
+      @verbatim (language="comment", text=
+        "if true, the most recent imu memory flash failed")
+      boolean diag_flash_memory_test_error;
+
+      @verbatim (language="comment", text=
+        "if true, indicates the failure of the inertial sensor")
+      boolean diag_sensor_self_test_error;
+
+      @verbatim (language="comment", text=
+        "if true, indicates communication error on SPI interface")
+      boolean diag_spi_communication_error;
+
+      @verbatim (language="comment", text=
+        "if true, indicates failure on CRC calculation")
+      boolean diag_crc_error;
+
+      @verbatim (language="comment", text=
+        "if true, a failure occurred on x axis gyroscope")
+      boolean diag_x_axis_gyroscope_failure;
+
+      @verbatim (language="comment", text=
+        "if true, a failure occurred on y axis gyroscope")
+      boolean diag_y_axis_gyroscope_failure;
+
+      @verbatim (language="comment", text=
+        "if true, a failure occurred on z axis gyroscope")
+      boolean diag_z_axis_gyroscope_failure;
+
+      @verbatim (language="comment", text=
+        "if true, a failure occurred on x axis accelerometer")
+      boolean diag_x_axis_accelerometer_failure;
+
+      @verbatim (language="comment", text=
+        "if true, a failure occurred on y axis accelerometer")
+      boolean diag_y_axis_accelerometer_failure;
+
+      @verbatim (language="comment", text=
+        "if true, a failure occurred on z axis accelerometer")
+      boolean diag_z_axis_accelerometer_failure;
+
+      @verbatim (language="comment", text=
+        "if true, the imu flash memory was written more times than the data-sheet specified endurance")
+      boolean diag_flash_memory_write_count_exceeded_error;
+
+      @verbatim (language="comment", text=
+        "the value of the imu flash writes")
+      uint32 flash_counter;
+    };
+  };
+};
